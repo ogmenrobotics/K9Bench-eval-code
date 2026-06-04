@@ -4,7 +4,7 @@
 
 """K9Bench evaluation script.
 
-Loads ``K9Bench/K9Bench`` from the Hugging Face Hub, attempts to download any
+Loads ``ogmen/K9Bench`` from the Hugging Face Hub, attempts to download any
 missing videos via yt-dlp, runs the video LLM, and writes a JSON of raw model
 outputs ready to be scored by ``evaluate_results.py``.
 
@@ -41,7 +41,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "true"
 
 
 # ---------------------------------------------------------------------------
-# Dataset adaptation: K9Bench/K9Bench -> the schema expected by the original
+# Dataset adaptation: ogmen/K9Bench -> the schema expected by the original
 # eval pipeline (scene_name, ground_truth, options-as-list, question_category).
 # ---------------------------------------------------------------------------
 
@@ -179,7 +179,7 @@ def build_messages(example: dict, use_system_message: bool, video_path: str, max
 def main():
     parser = argparse.ArgumentParser(description="Evaluate a video LLM on K9Bench.")
     parser.add_argument("--model_name_or_path", type=str, default="Qwen/Qwen3-VL-4B-Instruct")
-    parser.add_argument("--dataset_name", type=str, default="K9Bench/K9Bench")
+    parser.add_argument("--dataset_name", type=str, default="ogmen/K9Bench")
     parser.add_argument("--split", type=str, default="test")
     parser.add_argument("--video_dir", type=str, default="./k9bench_videos",
                         help="Local directory holding {scene_name}.mp4 files.")

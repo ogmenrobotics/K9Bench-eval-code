@@ -72,7 +72,7 @@ def extract_scene_name(video_url: str) -> str:
 def load_k9bench() -> dict:
     """Load K9Bench from HuggingFace and index by idx."""
     log.info("Loading K9Bench dataset from HuggingFace...")
-    ds = load_dataset("K9Bench/K9Bench", split="test")
+    ds = load_dataset("ogmen/K9Bench", split="test")
     log.info(f"Loaded {len(ds)} samples")
 
     index = {}
