@@ -224,3 +224,15 @@ values are skipped automatically.
 - [`evaluate_results.py`](evaluate_results.py) — cosine scoring (fine mode)
 - [`run_eval.sh`](run_eval.sh) — SLURM launcher (1× A40) running the full pipeline
 - [`subjective_evals.py`](subjective_evals.py) — subjective evaluation script
+
+## Citation
+
+```bash
+@article{attarde2026k9bench,
+  title={K9-Bench: Evaluating Multimodal LLMs on Canine-Centric Videos},
+  author={Attarde, Khush and Ali, Yusuf and Thukral, Megha and Bhutani, Divye and Ploetz, Thomas and Kira, Zsolt},
+  journal={arXiv preprint arXiv:2607.02680},
+  year={2026},
+  url={https://arxiv.org/abs/2607.02680}
+}
+```
