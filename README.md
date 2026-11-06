@@ -1,41 +1,29 @@
-<p align="center">
-  <a href="https://arxiv.org/abs/2607.02680">
-    <img src="https://img.shields.io/badge/arXiv-2607.02680-B31B1B?style=flat-square&logo=arxiv&logoColor=white" alt="arXiv">
-  </a>
-  <a href="https://ogmenrobotics.github.io/K9Bench/">
-    <img src="https://img.shields.io/badge/Website-K9--Bench-blue?style=flat-square" alt="Website">
-  </a>
-  <img src="https://img.shields.io/badge/NeurIPS_E%26D-2026-2E8B57?style=flat-square" alt="Accepted at NeurIPS E&D 2026">
-  <a href="https://huggingface.co/datasets/ogmen/K9Bench">
-    <img src="https://img.shields.io/badge/Dataset-Hugging_Face-yellow?style=flat-square&logo=huggingface&logoColor=white" alt="Dataset">
-  </a>
-</p>
+![arXiv](https://img.shields.io/badge/arXiv-2607.02680-B31B1B?style=flat-square&logo=arxiv&logoColor=white) [](https://ogmenrobotics.github.io/K9Bench/)![Website](https://img.shields.io/badge/Website-K9--Bench-blue?style=flat-square)[](https://ogmenrobotics.github.io/K9Bench/)![Accepted at NeurIPS E&D 2026](https://img.shields.io/badge/NeurIPS_E%26D-2026-2E8B57?style=flat-square)[ ](https://ogmenrobotics.github.io/K9Bench/)![Dataset](https://img.shields.io/badge/Dataset-Hugging_Face-yellow?style=flat-square&logo=huggingface&logoColor=white)[
 
-<h1 align="center">
-  K9-Bench: Evaluating Multimodal LLMs on Canine-Centric Videos
-</h1>
+# K9-Bench: Evaluating Multimodal LLMs on Canine-Centric Videos
 
-<p align="center">
-  <a href="#">Khush Attarde*</a>,
-  <a href="#">Yusuf Ali*</a>,
-  <a href="#">Megha Thukral<sup>†</sup></a>,
-  <a href="#">Divye Bhutani</a>,
-  <a href="#">Thomas Ploetz</a>,
-  <a href="#">Zsolt Kira</a>
-</p>
+[Khush Attarde*](#), [Yusuf Ali](#)*, [Megha Thukral†](#), [Divye Bhutani](#), [Thomas Ploetz](#), [Zsolt Kira](#)
 
-<p align="center">
-  <em>
-    * Equal contribution &nbsp; · &nbsp; † Core contributor
-  </em>
-</p>
+** Equal contribution   ·   † Core contributor*
 
 ---
+
+
+
+## ⚠️ License & Opt-Out
+
+> **Please read the [LICENSE.md](./LICENSE.md) for the Terms of Use and licensing conditions before accessing or using K9-Bench.**
+>
+> Content creators and rights holders may request the removal of their videos from K9-Bench at any time by submitting the [Takedown and Opt-Out Form](https://forms.gle/9YtQAwaoqnKhWriU6), or by emailing [khushattarde2003@gmail.com](mailto:khushattarde2003@gmail.com) or [yusufali.dtu.98@gmail.com](mailto:yusufali.dtu.98@gmail.com).
+
+---
+
+
 
 # K9Bench evaluation suite
 
 Evaluate multimodal LLMs on
-[`ogmen/K9Bench`](https://huggingface.co/datasets/ogmen/K9Bench) — 4744
+`[ogmen/K9Bench](https://huggingface.co/datasets/ogmen/K9Bench)` — 4744
 five-way multiple-choice questions over 907 real-world videos of domestic dogs,
 covering posture, action sequences, interaction, context and cause-effect
 reasoning.
@@ -45,6 +33,8 @@ closed-source models served over an API, under two evaluation protocols, with
 sharded multi-GPU execution and both scoring methods used in the paper.
 
 ---
+
+
 
 ## 1. Install
 
@@ -68,6 +58,8 @@ Requirements: a GPU supporting `bf16` and `flash_attention_2` (an A40 is
 sufficient for models up to 14B; 32B needs two), plus `yt-dlp` and `ffmpeg`.
 
 ---
+
+
 
 ## 2. Quick start
 
@@ -94,6 +86,8 @@ and thinking flag from the registry, and scoring the merged result for you.
 
 ---
 
+
+
 ## 3. The `k9bench` command
 
 ```bash
@@ -112,12 +106,14 @@ to know whether a model is Qwen-style or InternVL-style, or which script handles
 which prompt protocol. Anything after the recognised flags is passed straight
 through to the underlying runner.
 
-| Command | Purpose |
-|---|---|
-| `k9bench models [--kind local\|api]` | list registered models, their family and supported protocols |
-| `k9bench eval --model NAME` | run inference here (`--protocol`, `--max_frames`, `--max_samples`, `--video_dir`, `--output_file`, `--config`) |
-| `k9bench eval --model NAME --shards N` | submit to SLURM instead: `1` = one job doing everything, `N>1` = N parallel shards, merged and scored |
-| `k9bench score --input_file … --output_file …` | score a raw result file (`--protocol`, `--threshold`) |
+
+| Command                                        | Purpose                                                                                                        |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `k9bench models [--kind local|api]`            | list registered models, their family and supported protocols                                                   |
+| `k9bench eval --model NAME`                    | run inference here (`--protocol`, `--max_frames`, `--max_samples`, `--video_dir`, `--output_file`, `--config`) |
+| `k9bench eval --model NAME --shards N`         | submit to SLURM instead: `1` = one job doing everything, `N>1` = N parallel shards, merged and scored          |
+| `k9bench score --input_file … --output_file …` | score a raw result file (`--protocol`, `--threshold`)                                                          |
+
 
 The CLI only builds command lines: without `--shards` it invokes a runner in
 `local_evals/` or `api_evals/`, and with `--shards` it invokes `run_eval.sh`.
@@ -132,6 +128,8 @@ API: `gemini-2.5-pro`, `gemini-2.5-pro-av` (audio+video), `qwen3-vl-235b`,
 `qwen3-omni-flash` (audio+video, <150s subset), `gpt-4o` (32 frames).
 
 ---
+
+
 
 ## 4. Two evaluation protocols
 
@@ -159,7 +157,11 @@ k9bench score --input_file … --output_file … --protocol mcq
 
 ---
 
+
+
 ## 5. Reproducing the paper
+
+
 
 ### Table 1 and Table 3 — local open-source models
 
@@ -209,6 +211,8 @@ overall quality. Saves after every entry, so it is safe to interrupt and resume.
 
 ---
 
+
+
 ## 6. Repository layout
 
 ```
@@ -231,6 +235,8 @@ is shared and sits at the root.
 
 ---
 
+
+
 ## 7. Running at scale
 
 `run_eval.sh` is the SLURM backend behind `k9bench eval --shards N`, and the
@@ -246,23 +252,27 @@ NUM_SHARDS=24 MODEL_NAME=my-org/MyVLM-7B MODEL_FAMILY=qwen TIME_LIMIT=08:00:00 \
     bash run_eval.sh
 ```
 
-| Variable | Default | Meaning |
-|---|---|---|
-| `MODEL_NAME` | `Qwen/Qwen3-VL-4B-Instruct` | HuggingFace model id |
-| `MODEL_FAMILY` | `qwen` | `qwen` or `internvl` |
-| `PROMPT_STYLE` | `openended` | `openended` or `mcq` |
-| `NUM_SHARDS` | `1` | >1 shards across that many SLURM jobs |
-| `MAX_FRAMES` | `32` | frames sampled per video |
-| `MAX_SAMPLES` | `10` | single-job mode only; `-1` for the full dataset |
-| `THINKING_MODE` | `0` | `1` for `-Thinking` model variants |
-| `GPUS` | `1` | A40s per shard; 32B models need 2 |
-| `VIDEO_DIR` / `OUT_DIR` | `k9bench_videos` / `eval_results` | paths |
-| `CONDA_ENV` | `k9bench` | environment to activate inside the job |
+
+| Variable                | Default                           | Meaning                                         |
+| ----------------------- | --------------------------------- | ----------------------------------------------- |
+| `MODEL_NAME`            | `Qwen/Qwen3-VL-4B-Instruct`       | HuggingFace model id                            |
+| `MODEL_FAMILY`          | `qwen`                            | `qwen` or `internvl`                            |
+| `PROMPT_STYLE`          | `openended`                       | `openended` or `mcq`                            |
+| `NUM_SHARDS`            | `1`                               | >1 shards across that many SLURM jobs           |
+| `MAX_FRAMES`            | `32`                              | frames sampled per video                        |
+| `MAX_SAMPLES`           | `10`                              | single-job mode only; `-1` for the full dataset |
+| `THINKING_MODE`         | `0`                               | `1` for `-Thinking` model variants              |
+| `GPUS`                  | `1`                               | A40s per shard; 32B models need 2               |
+| `VIDEO_DIR` / `OUT_DIR` | `k9bench_videos` / `eval_results` | paths                                           |
+| `CONDA_ENV`             | `k9bench`                         | environment to activate inside the job          |
+
 
 If a shard fails, rerun the launcher: the MCQ runners resume from their
 checkpoint, and `combine_shards.py` reports which index ranges are missing.
 
 ---
+
+
 
 ## 8. Adding a model
 
@@ -283,6 +293,8 @@ own loading or a different API.
 
 ---
 
+
+
 ## 9. Notes
 
 **Videos are not redistributed.** Only YouTube ids ship with the dataset;
@@ -292,13 +304,7 @@ the container seekable, which otherwise causes the video reader to hang.
 
 ---
 
-## 10. Video Takedown and Opt-Out
 
-Content creators and rights holders may request the removal of their videos from K9-Bench at any time by submitting the [Takedown and Opt-Out Form](https://forms.gle/9YtQAwaoqnKhWriU6), or by emailing [khushattarde2003@gmail.com](mailto:khushattarde2003@gmail.com) or [yali30@gatech.edu.in](mailto:yali30@gatech.edu.in).
-
-Please include the YouTube video URL or ID and confirm that you are the creator or an authorized rights holder. Valid requests will be processed within 15 days. Upon approval, the corresponding video references, associated QA pairs, and metadata will be removed from the dataset and its splits.
-
-By accessing the dataset, users agree to honor such removal requests by discontinuing the use of removed items and using the latest available version of the dataset.
 
 ## Citation
 
@@ -311,3 +317,4 @@ By accessing the dataset, users agree to honor such removal requests by disconti
   url={https://arxiv.org/abs/2607.02680}
 }
 ```
+
