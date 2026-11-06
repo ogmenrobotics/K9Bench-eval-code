@@ -1,0 +1,22 @@
+# =============================================
+# Configuration for Deaf-Blind (text-only) LLM filtering
+# =============================================
+# Run once per model, then take the majority vote with deafblind_results.py.
+# The three models used for the reported results are:
+#   deepseek-ai/DeepSeek-R1-Distill-Qwen-32B
+#   Qwen/Qwen3-32B
+#   mistralai/Mistral-Small-3.2-24B-Instruct-2506
+
+model_name: "Qwen/Qwen3-32B"        # override per run with --model_name
+
+# The QA pool BEFORE deaf-blind filtering. This stage is what produces the
+# filtered set, so it does not run on the released (already filtered) dataset.
+dataset_name: "username/hf_dataset_name"
+split: "test"
+
+# Prompts (copied verbatim from the reported runs)
+prompt_file: "../../data/meta_info/prompts/bias_mitigation/prompt_deafblind.txt"
+mistral_system_prompt_file: "../../data/meta_info/prompts/bias_mitigation/prompt_deafblind_mistral_system.txt"
+
+# Output: <output_dir>/<model_name>/worker_<id>.json
+output_dir: "../../data/intermediary_files/bias_mitigation/deafblind/outputs"

@@ -1,0 +1,19 @@
+# Qwen3-VL-235B-A22B via Alibaba DashScope (Table 1, 1 FPS).
+api_key: "YOUR_DASHSCOPE_API_KEY_HERE"   # or export DASHSCOPE_API_KEY
+
+model: "qwen3-vl-235b-a22b-instruct"
+hf_dataset: "ogmen/K9Bench"
+hf_split: "test"
+
+fps: 1
+modality: "video"
+videos_dir: "k9bench_videos"
+
+results_file: "eval_results/qwen3vl-235b/raw.jsonl"
+failed_log: "eval_results/qwen3vl-235b/failed.log"
+
+rate_limit_rpm: 60
+rate_limit_tpm: 100000
+
+# Uncomment to target a different DashScope region.
+base_url: "https://dashscope-intl.aliyuncs.com/api/v1"

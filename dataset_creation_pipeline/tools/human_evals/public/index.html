@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VQA Review Tool</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 1400px;
+      margin: auto;
+    }
+    .header {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .panels {
+      display: flex;
+      gap: 20px;
+    }
+    .left, .right {
+      flex: 1;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+    }
+    iframe {
+      width: 100%;
+      height: 480px;
+      border-radius: 8px;
+      border: none;
+    }
+    textarea {
+      width: 100%;
+      height: 160px;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1em;
+    }
+    button {
+      padding: 12px 20px;
+      margin: 8px 5px 0 0;
+      border: none;
+      border-radius: 4px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    .accept {
+      background: #28a745;
+      color: #fff;
+    }
+    .reject {
+      background: #dc3545;
+      color: #fff;
+    }
+    .guidelines {
+      font-size: 0.95em;
+      background: #fafafa;
+      border-left: 4px solid #007bff;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container">
+
+  <div class="header">
+    <h2>Human Evaluation Guidelines</h2>
+
+    <div class="guidelines">
+      <strong>1. Watch the Video</strong>
+	<ul>
+	  <li>Play the video fully before answering (auto-plays, muted, no controls).</li>
+	  <li>Observe the dog’s posture, tail position, body movement, interaction, and surrounding context.</li>
+	  <li>Replay the video if necessary to confirm details.</li>
+	</ul>
+
+	<strong>2. Review the Question</strong>
+	<ul>
+	  <li>Ensure the question is directly relevant to the video content.</li>
+	  <li>Use appropriate canine action terms, posture cues, interaction descriptions, and clear cause–effect relationships in the response.</li>
+	  <li>Clearly trace interactions and behavioral changes when applicable.</li>
+	</ul>
+
+	<strong>3. Provide an Open-Ended Answer</strong>
+	<ul>
+	  <li>Write a clear, factual description strictly based on visible evidence in the video.</li>
+	  <li>Do not assume intent, emotion, or context that is not visually or audibly observable.</li>
+	</ul>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="left">
+      <h3 id="question"></h3>
+      <label><strong>Human Answer (Open-ended):</strong></label>
+      <textarea id="human-answer" placeholder="Write your answer here..."></textarea>
+    </div>
+
+    <div class="right">
+      <iframe id="video-frame"></iframe>
+      <p><strong>Video ID:</strong> <span id="video-id"></span></p>
+    </div>
+  </div>
+
+  <div style="margin-top:15px;">
+    <button class="accept" onclick="submit('accepted')">Save and Next</button>
+    <button class="reject" onclick="submit('rejected')">Reject</button>
+  </div>
+
+</div>
+
+<script>
+let currentVideo = null;
+
+async function loadNext() {
+  const res = await fetch('/next-video');
+  const data = await res.json();
+
+  if (!data.video) {
+    alert('No more questions.');
+    return;
+  }
+
+  currentVideo = data.video;
+  document.getElementById('question').innerText = data.video.question;
+  document.getElementById('video-id').innerText = data.video.videoId;
+  document.getElementById('video-frame').src =
+    `https://www.youtube-nocookie.com/embed/${data.video.videoId}?autoplay=1&controls=0`;
+  document.getElementById('human-answer').value = '';
+}
+
+async function submit(status) {
+  if (!currentVideo) return;
+
+  const humanAnswer = document.getElementById('human-answer').value.trim();
+
+  if (status === 'accepted' && humanAnswer.length < 10) {
+    alert('Please provide a meaningful open-ended answer.');
+    return;
+  }
+
+  await fetch('/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      videoId: currentVideo.videoId,
+      question: currentVideo.question,
+      status,
+      human_answer: humanAnswer,
+      reason: status === 'rejected' ? 'Human rejected during validation' : ''
+    })
+  });
+
+  loadNext();
+}
+
+loadNext();
+</script>
+
+</body>
+</html>
+

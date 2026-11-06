@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download YouTube videos for the K9Bench/K9Bench dataset and save them as
+"""Download YouTube videos for the ogmen/K9Bench dataset and save them as
 ``{scene_name}.mp4``. ``scene_name`` is the 11-character YouTube video id
 extracted from the dataset's ``video_url`` column.
 
@@ -101,7 +101,7 @@ def download_video(video_url: str, output_path: str, ffmpeg_exe: str) -> bool:
 
 def main():
     parser = argparse.ArgumentParser(description="Download K9Bench videos from YouTube.")
-    parser.add_argument("--dataset_name", default="K9Bench/K9Bench")
+    parser.add_argument("--dataset_name", default="ogmen/K9Bench")
     parser.add_argument("--split", default="test")
     parser.add_argument("--output_dir", default="./k9bench_videos",
                         help="Directory where {scene_name}.mp4 files will be saved.")

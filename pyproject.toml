@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "k9bench"
+version = "1.0.0"
+description = "Evaluation suite for K9Bench, a canine-centric video question-answering benchmark"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "datasets",
+    "PyYAML",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+# Local open-source model evaluation. Pinned versions live in requirements.txt;
+# flash-attn is installed separately by install.sh.
+local = [
+    "torch",
+    "transformers",
+    "accelerate",
+    "sentence-transformers",
+    "qwen-vl-utils",
+    "timm",
+    "einops",
+    "decord",
+    "opencv-python-headless",
+    "pillow",
+]
+# Closed-source API evaluation.
+api = [
+    "google-genai",
+    "dashscope",
+    "openai",
+]
+
+[project.scripts]
+k9bench = "k9bench.cli:main"
+
+[tool.setuptools]
+packages = ["k9bench", "k9bench.models"]

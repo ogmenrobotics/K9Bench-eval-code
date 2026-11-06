@@ -9,10 +9,10 @@ Example::
 
     export OPENAI_API_KEY=sk-...
 
-    python pawbench/k9bench_release/subjective_evals.py \\
-        --evaluations pawbench/k9bench_release/eval_results/eval_Qwen3-VL-4B-Instruct_mf32_n100.json \\
-        --output     pawbench/k9bench_release/eval_results/llm_judge_Qwen3-VL-4B-Instruct.json \\
-        --skipped    pawbench/k9bench_release/eval_results/llm_judge_Qwen3-VL-4B-Instruct_skipped.json
+    python subjective_evals.py \\
+        --evaluations eval_results/eval_Qwen3-VL-4B-Instruct_mf32_n100.json \\
+        --output      eval_results/llm_judge_Qwen3-VL-4B-Instruct.json \\
+        --skipped     eval_results/llm_judge_Qwen3-VL-4B-Instruct_skipped.json
 """
 
 import os
@@ -253,25 +253,26 @@ def main():
     skipped: list = load_json(args.skipped)
     processed_ids = {r["idx"] for r in results}
 
+    # Judge only the questions the model actually answered
+    remaining = [i for i in sorted(model_answers.keys()) if i not in processed_ids]
+
     log.info(f"Loaded {len(k9bench)} questions")
+    log.info(f"Model answers available: {len(model_answers)}")
     log.info(f"Already processed: {len(processed_ids)}")
+    log.info(f"To judge this run: {len(remaining)}")
 
-    for idx in sorted(k9bench.keys()):
+    for idx in remaining:
 
-        if idx in processed_ids:
-            continue
-
-        if idx not in model_answers:
-            log.warning(f"Missing model answer for idx={idx}")
+        entry = k9bench.get(idx)
+        if entry is None:
+            log.warning(f"idx={idx} has a model answer but is not in the dataset")
             skipped.append({
                 "idx":       idx,
-                "error":     "missing_model_answer",
+                "error":     "idx_not_in_dataset",
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
             })
             save_json(args.skipped, skipped)
             continue
-
-        entry = k9bench[idx]
 
         try:
             log.info(f"Processing idx {idx}")
@@ -329,4 +330,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

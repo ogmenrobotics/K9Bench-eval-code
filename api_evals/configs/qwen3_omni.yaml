@@ -1,0 +1,22 @@
+# Qwen3-Omni-Flash audio+video (Table 2, videos under 150s only).
+api_key: "YOUR_DASHSCOPE_API_KEY_HERE"   # or export DASHSCOPE_API_KEY
+
+model: "qwen3-omni-flash"
+base_url: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+hf_dataset: "ogmen/K9Bench"
+hf_split: "test"
+
+modality: "audio_video"
+videos_dir: "k9bench_videos"
+
+# Qwen3-Omni only accepts videos shorter than this, which is why the paper
+# reports it on a 2693-QA subset rather than all 4744.
+max_duration_sec: 150
+max_bytes: 268435456          # 256 MB inline base64 limit
+duration_cache: "eval_results/video_durations.json"
+
+results_file: "eval_results/qwen3-omni/raw.jsonl"
+failed_log: "eval_results/qwen3-omni/failed.log"
+
+rate_limit_rpm: 60
+rate_limit_tpm: 100000

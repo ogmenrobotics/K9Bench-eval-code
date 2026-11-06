@@ -1,0 +1,33 @@
+# =============================================
+# Main Video QA Processing Pipeline Configuration
+# =============================================
+
+logging:
+  level: INFO
+
+# Common Settings
+video_ids_file: "../../data/meta_info/video_metadata/filtered_video_ids.txt"
+
+# =============================================
+# Narration Step
+# =============================================
+narration:
+  config_file: "narration_config.yaml"
+
+# =============================================
+# QA Step (CBF → CSRD → CSPU)
+# =============================================
+qa:
+  variants:
+    - "cbf"
+    - "csrd"
+    - "cspu"
+
+# =============================================
+# MCQ Step (CBF → CSRD → CSPU)
+# =============================================
+mcq:
+  variants:
+    - "cbf"
+    - "csrd"
+    - "cspu"

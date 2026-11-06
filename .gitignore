@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.env
+
+*.egg-info/
+build/
+dist/
+
+k9bench_videos/
+eval_results/
+slurm_logs/

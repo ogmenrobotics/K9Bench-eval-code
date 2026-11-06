@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+
+data/video_data/
+data/meta_info/gemini_api_keys.txt
+data/meta_info/youtube_api_keys.txt
+
+node_modules/

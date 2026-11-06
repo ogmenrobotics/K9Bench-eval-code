@@ -1,0 +1,23 @@
+# Gemini evaluation (Table 1 video-only; set modality: audio_video for Table 2).
+api_keys:
+  - "GEMINI_API_KEY_1"
+  - "GEMINI_API_KEY_2"
+
+model_name: "gemini-2.5-pro"
+hf_dataset: "ogmen/K9Bench"
+hf_split: "test"
+
+# video       -> audio is stripped into silent_videos_dir before upload (Table 1)
+# audio_video -> the original file is uploaded with its audio track (Table 2)
+modality: "video"
+
+videos_dir: "k9bench_videos"
+silent_videos_dir: "k9bench_videos_silent"
+
+results_file: "eval_results/gemini-2.5-pro/raw.jsonl"
+failed_log: "eval_results/gemini-2.5-pro/failed.log"
+
+rate_limit_rpm: 8
+rate_limit_tpm: 1000000
+max_retries: 3
+upload_timeout: 600

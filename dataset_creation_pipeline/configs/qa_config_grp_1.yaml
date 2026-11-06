@@ -1,0 +1,25 @@
+# =============================================
+# Configuration for Gemini Video QA Agent
+# =============================================
+
+api_keys:
+  - "GEMINI_API_KEY_1"     # ← Change to your real key(s)
+  - "GEMINI_API_KEY_2"                                            # Add more keys if you have
+
+model_name: "gemini-2.5-flash"
+
+# Input Paths
+video_ids_file: "../../data/meta_info/video_metadata/filtered_video_ids.txt"
+prompt_file: "../../data/meta_info/prompts/qa_gen/prompt_grp_1.txt"
+
+# Output Paths
+output_dir: "../../data/intermediary_files/qa/outputs/grp_1"
+failed_log: "../../data/meta_info/logs/qa/failed_qa_grp_1.log"
+
+# Rate Limiting
+rate_limit_rpm: 12
+rate_limit_tpm: 1000000
+
+# Processing Settings
+upload_timeout: 300
+max_retries: 3

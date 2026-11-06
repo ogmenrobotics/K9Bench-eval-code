@@ -1,0 +1,19 @@
+# =============================================
+# Configuration for Paraphrasing Script (ZAI / GLM-4)
+# =============================================
+
+api_key: "ZAI_API_KEY"
+model_name: "glm-4.5-flash"
+
+# Folders and Files
+high_level_folder: "../../data/intermediary_files/bias_mitigation/speaker_information/outputs/"
+output_json: "../../data/intermediary_files/bias_mitigation/mcq_speaker_info_removed.json"
+prompt_file: "../../data/meta_info/prompts/bias_mitigation/prompt_speaker_removal.txt"                   
+
+# Dataset Settings
+dataset_name: "username/hf_dataset_name" 
+default_split: "test"
+
+# Processing Settings
+max_retries: 3
+sleep_between_requests: 1

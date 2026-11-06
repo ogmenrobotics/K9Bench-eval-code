@@ -1,0 +1,29 @@
+# =============================================
+# Configuration for Gemini MCQ Generator
+# =============================================
+
+api_keys:
+  - "GEMINI_API_KEY_1"     # ← Change to your real key(s)
+  - "GEMINI_API_KEY_2"                                            # Add more keys if you have
+  
+model_name: "gemini-2.5-flash"
+
+# Input Files
+video_ids_file: "../../data/meta_info/video_metadata/filtered_video_ids.txt"
+prompt_file: "../../data/meta_info/prompts/mcq_gen/prompt_grp_2.txt"
+
+# Directory Paths
+qa_dir: "../../data/intermediary_files/qa/outputs/grp_2"
+narration_dir: "../../data/intermediary_files/narration/outputs"
+output_dir: "../../data/intermediary_files/mcq/outputs/grp_2"
+thought_dir: "../../data/intermediary_files/mcq/thoughts/grp_2"
+
+# Failed Log
+failed_log: "../../data/meta_info/logs/mcq/failed_mcq_grp_2.log"
+
+# Rate Limiting
+rate_limit_rpm: 10
+rate_limit_tpm: 1000000
+
+# Processing Settings
+max_retries: 3

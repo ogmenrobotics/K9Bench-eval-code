@@ -1,0 +1,32 @@
+# --- API keys ---
+# List one or more keys. Multiple keys let the script rotate to the next
+# one automatically if it hits a 429 / quota error.
+api_keys:
+  - "YOUR_OPENAI_API_KEY_1"
+  # - "YOUR_OPENAI_API_KEY_2"
+# If you leave this empty/placeholder, it falls back to the OPENAI_API_KEY
+# env var (single key, no rotation).
+
+# --- Model ---
+model_name: "gpt-4o"
+
+# --- Dataset ---
+hf_dataset: "ogmen/K9Bench"
+hf_split: "test"
+
+# --- Videos ---
+videos_dir: "k9bench_videos"        # expects {scene_name}.mp4 inside this dir
+
+# --- Frame sampling ---
+max_frames: 32
+image_detail: "high"                 # "low" is cheaper/faster, "high" for more detail
+
+# --- Output ---
+results_file: "eval_results/gpt4o/raw.jsonl"
+failed_log: "eval_results/gpt4o/failed.log"
+modality: "video_frames"            # just a label recorded in each result row
+
+# --- Retry / rate limiting ---
+max_retries: 3
+rate_limit_rpm: 8            # requests per minute
+rate_limit_tpm: 1000000      # tokens per minute

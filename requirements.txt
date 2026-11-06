@@ -1,0 +1,31 @@
+# Pinned to the exact versions used for all reported K9Bench results.
+# flash-attn is installed separately by install.sh (it requires torch at build time).
+
+# Model stack
+torch==2.6.0
+torchvision==0.21.0
+transformers==4.57.1
+tokenizers==0.22.1
+accelerate==1.9.0
+huggingface-hub==0.36.0
+datasets==4.3.0
+sentence-transformers==5.1.2
+qwen-vl-utils==0.0.14
+timm==1.0.19
+einops==0.8.1
+
+# Video decoding and IO
+decord==0.6.0
+av==15.0.0
+opencv-python-headless==4.11.0.86
+imageio-ffmpeg==0.6.0
+pillow==11.3.0
+yt-dlp==2025.7.21
+
+# LLM-as-judge (subjective_evals.py)
+openai==1.97.1
+
+numpy==2.2.6
+tqdm==4.67.1
+requests==2.32.4
+PyYAML==6.0.2

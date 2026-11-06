@@ -1,0 +1,19 @@
+You are an expert in answering multiple-choice questions.
+You are provided with one question and five answer options (A–E).
+Your task:
+1. Carefully analyze the questions and options.
+2. Provide clear, step-by-step reasoning explaining why each option is correct or incorrect.
+3. Select the single best answer (A, B, C, D or E).
+4. Respond with the reasoning_trace and selected_option
+
+Question: {question}
+Options: {options}
+
+Please follow the output format:
+Output Format (should be in JSON format):
+```json
+{
+"reasoning_trace": str.
+"selected_option": str.
+}
+```

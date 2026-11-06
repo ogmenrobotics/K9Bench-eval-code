@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# Copyright 2025 The HuggingFace Team. All rights reserved.
-# Licensed under the Apache License, Version 2.0 (the "License").
+# Copyright 2025 The K9Bench Authors.
+# SPDX-License-Identifier: Apache-2.0
 
 """K9Bench scoring pipeline.
 
@@ -36,6 +36,24 @@ from sentence_transformers import SentenceTransformer
 SIMILARITY_MODEL = "Qwen/Qwen3-Embedding-8B"
 
 
+def is_failed_record(r: dict) -> bool:
+    """True for records that inference could not produce an answer for (e.g. the
+    video was unavailable on YouTube). These are excluded from the accuracy
+    denominator rather than counted as wrong."""
+    return bool(r.get("error")) or "answer" not in r or "options" not in r
+
+
+def report_failed(failed: list, total: int, what: str) -> None:
+    if not failed:
+        return
+    print(f"\n!! {len(failed)}/{total} records {what}:")
+    for r in failed:
+        ident = r.get("idx", r.get("example_id", "?"))
+        scene = r.get("scene_name", r.get("video", "?"))
+        print(f"     idx={ident} scene={scene} error={r.get('error', 'no answer field')}")
+    print()
+
+
 def cosine_similarities(answer, options, model):
     a = model.encode(answer, prompt_name="query",
                      convert_to_tensor=True, normalize_embeddings=True)
@@ -58,16 +76,24 @@ def step_calculate(input_file: str, output_file: str):
     )
 
     out = []
+    failed = []
     for i, r in enumerate(results):
-        sims = cosine_similarities(r["answer"], r["options"], model)
-        sim_dict = {chr(ord('A') + j): float(s) for j, s in enumerate(sims)}
-        out.append({**r, "cosine_similarities": sim_dict})
+        if is_failed_record(r):
+            failed.append(r)
+            out.append(r)
+        else:
+            sims = cosine_similarities(r["answer"], r["options"], model)
+            sim_dict = {chr(ord('A') + j): float(s) for j, s in enumerate(sims)}
+            out.append({**r, "cosine_similarities": sim_dict})
         if (i + 1) % 100 == 0 or i == 0:
             print(f"  {i + 1}/{len(results)}")
 
+    report_failed(failed, len(results), "skipped during similarity calculation")
+
     payload = {**data, "individual_results": out,
                "similarity_model": SIMILARITY_MODEL,
-               "similarity_calculated_at": datetime.now().isoformat()}
+               "similarity_calculated_at": datetime.now().isoformat(),
+               "inference_error_count": len(failed)}
     print(f"Saving -> {output_file}")
     json.dump(payload, open(output_file, "w"), indent=2)
 
@@ -97,16 +123,26 @@ def step_evaluate(input_file: str, output_file: str, threshold: float):
     print(f"Found {len(results)} examples; threshold={threshold}; mode=fine")
 
     correct = 0
+    scored = 0
     cat_stats = defaultdict(lambda: {"correct": 0, "total": 0})
     evaluated = []
+    failed = []
 
     for i, r in enumerate(results):
+        if is_failed_record(r) or "cosine_similarities" not in r:
+            failed.append(r)
+            evaluated.append({**r, "is_correct": None,
+                              "evaluation_explanation": "not scored: inference failed",
+                              "eval_mode": "fine"})
+            continue
+
         sims_dict = r["cosine_similarities"]
         sims = [sims_dict[chr(ord('A') + j)] for j in range(len(sims_dict))]
         ok, why = is_correct_fine(r["ground_truth"], sims, threshold)
 
         cat = r["question_category"]
         cat_stats[cat]["total"] += 1
+        scored += 1
         if ok:
             correct += 1
             cat_stats[cat]["correct"] += 1
@@ -115,11 +151,16 @@ def step_evaluate(input_file: str, output_file: str, threshold: float):
                           "eval_mode": "fine"})
 
         if (i + 1) % 100 == 0 or i == 0:
-            print(f"  {i + 1}/{len(results)}  acc={correct / (i + 1):.4f}")
+            print(f"  {i + 1}/{len(results)}  acc={correct / scored:.4f}")
 
-    total = len(results)
+    report_failed(failed, len(results), "excluded from scoring (inference failed)")
+
+    total = scored
     accuracy = correct / total if total else 0.0
     print(f"\nAccuracy: {accuracy:.4f}  ({correct}/{total})")
+    if failed:
+        print(f"Excluded from denominator: {len(failed)} failed record(s) "
+              f"out of {len(results)} total.")
     print(f"\n{'category':<30} {'accuracy':<10} {'correct/total':<15}")
     print("-" * 60)
     cat_acc = {}
@@ -136,6 +177,13 @@ def step_evaluate(input_file: str, output_file: str, threshold: float):
         "accuracy": accuracy,
         "correct_count": correct,
         "total_count": total,
+        "inference_error_count": len(failed),
+        "inference_errors": [
+            {"idx": r.get("idx", r.get("example_id")),
+             "scene_name": r.get("scene_name"),
+             "error": r.get("error", "no answer field")}
+            for r in failed
+        ],
         "category_wise_accuracy": cat_acc,
         "individual_results": evaluated,
         "metadata": {

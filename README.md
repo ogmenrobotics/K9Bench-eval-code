@@ -1,229 +1,304 @@
-# K9Bench evaluation pipeline
+<p align="center">
+  <a href="https://arxiv.org/abs/2607.02680">
+    <img src="https://img.shields.io/badge/arXiv-2607.02680-B31B1B?style=flat-square&logo=arxiv&logoColor=white" alt="arXiv">
+  </a>
+  <a href="https://ogmenrobotics.github.io/K9Bench/">
+    <img src="https://img.shields.io/badge/Website-K9--Bench-blue?style=flat-square" alt="Website">
+  </a>
+  <img src="https://img.shields.io/badge/NeurIPS_E%26D-2026-2E8B57?style=flat-square" alt="Accepted at NeurIPS E&D 2026">
+  <a href="https://huggingface.co/datasets/ogmen/K9Bench">
+    <img src="https://img.shields.io/badge/Dataset-Hugging_Face-yellow?style=flat-square&logo=huggingface&logoColor=white" alt="Dataset">
+  </a>
+</p>
 
-End-to-end scripts to evaluate a video LLM on the
-[`ogmen/K9Bench`](https://huggingface.co/datasets/ogmen/K9Bench) dataset:
+<h1 align="center">
+  K9-Bench: Evaluating Multimodal LLMs on Canine-Centric Videos
+</h1>
 
-1. Download YouTube videos referenced by the dataset (`video_url` →
-   `{scene_name}.mp4`).
-2. Run the model and write raw model outputs.
-3. Score outputs with cosine-similarity matching against the MCQ options.
+<p align="center">
+  <a href="#">Khush Attarde*</a>,
+  <a href="#">Yusuf Ali*</a>,
+  <a href="#">Megha Thukral<sup>†</sup></a>,
+  <a href="#">Divye Bhutani</a>,
+  <a href="#">Thomas Ploetz</a>,
+  <a href="#">Zsolt Kira</a>
+</p>
 
-## Prerequisites
+<p align="center">
+  <em>
+    * Equal contribution &nbsp; · &nbsp; † Core contributor
+  </em>
+</p>
 
-- A conda env with `transformers`, `qwen-vl-utils`, `sentence-transformers`,
-  `flash-attn`, `datasets`, `torch`, `tqdm`, `peft`, `trl`.
-- `yt-dlp` and an `ffmpeg` binary. If `ffmpeg` is not on `$PATH`, the scripts
-  fall back to the binary bundled with `imageio-ffmpeg`
-  (`pip install imageio-ffmpeg`).
-- A GPU that supports `bf16` + `flash_attention_2` (an A40 is fine).
+---
 
-## Quick start (single SLURM job, 1× A40)
+# K9Bench evaluation suite
 
-From the repo root:
+Evaluate multimodal LLMs on
+[`ogmen/K9Bench`](https://huggingface.co/datasets/ogmen/K9Bench) — 4744
+five-way multiple-choice questions over 907 real-world videos of domestic dogs,
+covering posture, action sequences, interaction, context and cause-effect
+reasoning.
 
-```bash
-sbatch run_eval.sh                    # default: 10 samples
-MAX_SAMPLES=100 sbatch run_eval.sh    # 100-sample smoke test
-MAX_SAMPLES=-1  sbatch run_eval.sh    # full 4744 samples
-```
+The suite covers local open-source models loaded with `transformers` and
+closed-source models served over an API, under two evaluation protocols, with
+sharded multi-GPU execution and both scoring methods used in the paper.
 
-[run_eval.sh](run_eval.sh) does all three steps in one job:
+---
 
-| step | what it does | output |
-|---|---|---|
-| 1 | `download_videos.py` (yt-dlp + ffmpeg passthrough remux) | `${VIDEO_DIR}/{scene}.mp4` |
-| 2 | `eval_video_llm.py` (model inference) | `raw_<model>_mf<frames>_n<N>.json` |
-| 3 | `evaluate_results.py --mode calculate` | `sim_<model>_mf<frames>_n<N>.json` |
-| 4 | `evaluate_results.py --mode evaluate`  | `eval_<model>_mf<frames>_n<N>.json` |
-
-Artifacts land under `${OUT_DIR}` (default `eval_results/`).
-
-### Environment-variable overrides for `run_eval.sh`
-
-| var | default | meaning |
-|---|---|---|
-| `MODEL_NAME` | `Qwen/Qwen3-VL-4B-Instruct` | HF model id |
-| `MAX_FRAMES` | `32` | frames sampled per video |
-| `MAX_SAMPLES` | `10` | run on first N rows only; `-1` = full dataset |
-| `VIDEO_DIR` | `k9bench_videos` | where `{scene}.mp4` lives |
-| `OUT_DIR` | `eval_results` | where JSONs go |
-
-Examples:
+## 1. Install
 
 ```bash
-# Reuse an existing video cache (no downloads needed)
-VIDEO_DIR=/path/to/cached_videos OUT_DIR=results_oldcache MAX_SAMPLES=100 \
-    sbatch run_eval.sh
-
-# Try a different model
-MODEL_NAME=Qwen/Qwen3-VL-32B-Instruct MAX_SAMPLES=-1 \
-    sbatch run_eval.sh
+bash install.sh          # creates the `k9bench` conda env and installs everything
+conda activate k9bench
+pip install -e .         # exposes the `k9bench` command
 ```
 
-## Running the scripts directly (no SLURM)
+`install.sh` pins every dependency to the exact version used for the reported
+results (see `requirements.txt`) and installs `flash-attn` last, since it needs
+torch present at build time.
+
+For closed-source API models, additionally:
 
 ```bash
-# 1. Download (or skip if videos already exist)
-python download_videos.py \
-    --output_dir k9bench_videos \
-    --max_samples 10
-
-# 2. Inference
-python eval_video_llm.py \
-    --model_name_or_path Qwen/Qwen3-VL-4B-Instruct \
-    --bf16 --torch_dtype bfloat16 --trust_remote_code \
-    --use_system_message True --max_frames 32 \
-    --video_dir k9bench_videos \
-    --max_samples 10 --auto_download \
-    --output_file results/raw.json
-
-# 3. Cosine similarities
-python evaluate_results.py \
-    --mode calculate --input_file results/raw.json --output_file results/sim.json
-
-# 4. Score
-python evaluate_results.py \
-    --mode evaluate --input_file results/sim.json --output_file results/eval.json \
-    --threshold 0.5
+pip install -r api_evals/requirements-api.txt
 ```
 
-## Major CLI args
+Requirements: a GPU supporting `bf16` and `flash_attention_2` (an A40 is
+sufficient for models up to 14B; 32B needs two), plus `yt-dlp` and `ffmpeg`.
 
-### [`download_videos.py`](download_videos.py)
+---
 
-| arg | default | what it does |
-|---|---|---|
-| `--dataset_name` | `ogmen/K9Bench` | HF dataset id |
-| `--split` | `test` | dataset split |
-| `--output_dir` | `./k9bench_videos` | where each `{scene_name}.mp4` is saved (`scene_name` = the 11-char YouTube id parsed from the dataset's `video_url` column) |
-| `--max_samples` | `-1` | only download videos for the first N dataset rows; `-1` = all |
+## 2. Quick start
 
-Each download is `yt-dlp` (preferring an mp4 ≤720p, video stream only) followed
-by an `ffmpeg -c copy -movflags +faststart` passthrough remux. The remux is
-**not** a re-encode: the H.264 stream is byte-identical, the container is just
-rewritten to be seekable, which avoids hangs in the video reader.
-
-### [`eval_video_llm.py`](eval_video_llm.py)
-
-| arg | default | what it does |
-|---|---|---|
-| `--model_name_or_path` | `Qwen/Qwen3-VL-4B-Instruct` | HF model id |
-| `--dataset_name` / `--split` | `ogmen/K9Bench` / `test` | dataset to evaluate |
-| `--video_dir` | `./k9bench_videos` | local directory of `{scene}.mp4` files |
-| `--auto_download` | off | if a video file is missing, fetch + remux on the fly via `download_videos.download_video` |
-| `--bf16`, `--torch_dtype` | off / `None` | bf16 mixed precision; pass `--torch_dtype bfloat16` to also load weights in bf16 |
-| `--trust_remote_code` | off | passed to `from_pretrained` |
-| `--use_system_message` | `True` | prepend the JSON-format reasoning system prompt |
-| `--max_frames` | `32` | upper bound on frames sampled per video |
-| `--start_idx` / `--end_idx` | `None` / `None` | optional slice of the dataset (used for parallelizing across SLURM jobs) |
-| `--max_samples` | `-1` | additional cap *after* slicing — useful for smoke tests |
-| `--thinking_mode` | off | bumps `max_new_tokens` from 2048 → 3072 (used with thinking-mode models) |
-| `--output_file` | `evaluation_results.json` | path for the raw output JSON |
-
-Output JSON shape: `{"individual_results": [...], "total_count": N}`. Each
-record carries `idx`, `question`, `options`, `ground_truth`, `response`,
-`answer`, `scene_name`, `question_category`, `prompt`, `model_name`,
-`max_frames`, `timestamp`.
-
-### [`evaluate_results.py`](evaluate_results.py)
-
-Two stages, picked via `--mode`:
-
-| arg | default | what it does |
-|---|---|---|
-| `--mode` | required, `calculate` or `evaluate` | stage 1 (embed + cosine) or stage 2 (threshold check) |
-| `--input_file` | required | input JSON (raw model outputs for `calculate`; sim JSON for `evaluate`) |
-| `--output_file` | required | where to write the result JSON |
-| `--threshold` | `0.5` | cosine threshold used in `evaluate` mode |
-
-Scoring rule (fine mode, the only one we ship):
-```
-is_correct = sim(answer, gt_option) > threshold
-             AND sim(answer, gt_option) is the strict argmax over all options
-```
-Embedding model is fixed to `Qwen/Qwen3-Embedding-8B`.
-
-The final eval JSON contains `accuracy`, `correct_count`, `total_count`,
-`category_wise_accuracy`, and the per-sample list under `individual_results`
-with added `is_correct` / `evaluation_explanation` fields.
-
-
-## Subjective Evaluation (LLM-as-Judge)
-
-In addition to cosine-similarity scoring, open-ended answers can be evaluated
-with GPT-4o as a judge via `subjective_evals.py`. The judge scores each model
-output against the ground-truth answer on five axes: **Logic**, **Factuality**,
-**Accuracy**, **Conciseness**, and **Overall** (all 1–10).
-
-### Prerequisites
+Ten samples, run right here. No cluster required:
 
 ```bash
-pip install openai datasets
-export OPENAI_API_KEY=sk-...
+k9bench eval --model qwen3-vl-4b --max_samples 10 --auto_download
+k9bench score --input_file eval_results/qwen3-vl-4b_mf32/raw.json \
+              --output_file eval_results/qwen3-vl-4b_mf32/eval.json
 ```
 
-### Usage
+This is the command to run first: it confirms the install, the dataset and the
+video download all work before committing GPU hours.
+
+On a SLURM cluster, add `--shards` to submit instead of running locally:
 
 ```bash
-python subjective_evals.py \
-    --evaluations eval_results/eval_Qwen3-VL-4B-Instruct_mf32_n100.json \
-    --output      eval_results/llm_judge_Qwen3-VL-4B-Instruct.json \
-    --skipped     eval_results/llm_judge_Qwen3-VL-4B-Instruct_skipped.json
+k9bench eval --model qwen3-vl-4b --shards 1     # one job: download, infer, score
+k9bench eval --model qwen3-vl-8b --shards 24    # 24 parallel shards, merged and scored
 ```
 
-### How it works
+`--shards` hands off to `run_eval.sh`, deriving the model's family, GPU count
+and thinking flag from the registry, and scoring the merged result for you.
 
-1. Loads ground-truth questions and options directly from the
-   `ogmen/K9Bench` HuggingFace dataset (no local file needed).
-2. Matches each entry to the model answer by `idx`.
-3. Sends a structured prompt to `gpt-4o` and parses the scored JSON response.
-4. Saves results incrementally after every entry — safe to interrupt and resume.
+---
 
-### Output format
+## 3. The `k9bench` command
 
-Each entry in the output JSON contains:
+```bash
+k9bench models                                   # list every registered model
+k9bench models --kind local
 
-```json
-{
-  "idx": 0,
-  "video_url": "https://www.youtube.com/watch?v=rbrbj6Olzg4",
-  "scene_name": "rbrbj6Olzg4",
-  "question_category": "action sequence",
-  "question": "...",
-  "correct_answer": "...",
-  "model_output": "...",
-  "cot": "...",
-  "scores": {
-    "Logic": 8,
-    "Factuality": 7,
-    "Accuracy": 8,
-    "Conciseness": 9,
-    "Overall": 8
-  },
-  "judge_model": "gpt-4o",
-  "timestamp": "2026-05-05 08:30:00"
-}
+k9bench eval --model qwen3-vl-8b --max_samples 10 --auto_download
+k9bench score --input_file eval_results/qwen3-vl-8b_mf32/raw.json \
+              --output_file eval_results/qwen3-vl-8b_mf32/eval.json
 ```
 
-Entries that fail (API error, parse error) are written to the `--skipped` file
-and can be retried by re-running the same command — already-processed `idx`
-values are skipped automatically.
+Add `--dry-run` to any command to print what would run without running it.
 
-### [`subjective_evals.py`](subjective_evals.py)
+`k9bench eval` selects the right runner from the model name, so you do not need
+to know whether a model is Qwen-style or InternVL-style, or which script handles
+which prompt protocol. Anything after the recognised flags is passed straight
+through to the underlying runner.
 
-| arg | what it does |
+| Command | Purpose |
 |---|---|
-| `--evaluations` | path to the pipeline output JSON (`eval_*.json`) |
-| `--output` | path to save judge results JSON |
-| `--skipped` | path to save skipped/failed entries JSON |
+| `k9bench models [--kind local\|api]` | list registered models, their family and supported protocols |
+| `k9bench eval --model NAME` | run inference here (`--protocol`, `--max_frames`, `--max_samples`, `--video_dir`, `--output_file`, `--config`) |
+| `k9bench eval --model NAME --shards N` | submit to SLURM instead: `1` = one job doing everything, `N>1` = N parallel shards, merged and scored |
+| `k9bench score --input_file … --output_file …` | score a raw result file (`--protocol`, `--threshold`) |
 
-## Files in this folder
+The CLI only builds command lines: without `--shards` it invokes a runner in
+`local_evals/` or `api_evals/`, and with `--shards` it invokes `run_eval.sh`.
+Both remain directly callable if you prefer to drive them yourself.
 
-- [`download_videos.py`](download_videos.py) — yt-dlp + ffmpeg remux
-- [`eval_video_llm.py`](eval_video_llm.py) — model inference
-- [`evaluate_results.py`](evaluate_results.py) — cosine scoring (fine mode)
-- [`run_eval.sh`](run_eval.sh) — SLURM launcher (1× A40) running the full pipeline
-- [`subjective_evals.py`](subjective_evals.py) — subjective evaluation script
+### Registered models
+
+Local (evaluated at 32 frames): `qwen3-vl-4b`, `qwen3-vl-8b`, `qwen3-vl-32b`,
+their `-thinking` variants, `internvl3.5-8b`, `internvl3.5-14b`.
+
+API: `gemini-2.5-pro`, `gemini-2.5-pro-av` (audio+video), `qwen3-vl-235b`,
+`qwen3-omni-flash` (audio+video, <150s subset), `gpt-4o` (32 frames).
+
+---
+
+## 4. Two evaluation protocols
+
+These are **not interchangeable**, and the distinction matters when comparing
+numbers.
+
+**Open-ended + cosine similarity** (default; this is what the paper's tables
+use). The model never sees the options. It answers in free form, the answer is
+embedded with `Qwen3-Embedding-8B`, and a response counts as correct only if
+similarity to the gold option exceeds 0.5 *and* beats every distractor.
+
+```bash
+k9bench eval --model qwen3-vl-8b --protocol openended
+k9bench score --input_file … --output_file … --protocol openended
+```
+
+**MCQ prompting + exact match.** All five options go in the prompt, the model
+ends with `ANSWER: X`, and the letter is compared directly. Needs no GPU to
+score.
+
+```bash
+k9bench eval --model qwen3-vl-8b --protocol mcq
+k9bench score --input_file … --output_file … --protocol mcq
+```
+
+---
+
+## 5. Reproducing the paper
+
+### Table 1 and Table 3 — local open-source models
+
+```bash
+k9bench eval --model qwen3-vl-8b          --shards 24
+k9bench eval --model internvl3.5-14b      --shards 24
+k9bench eval --model qwen3-vl-32b-thinking --shards 24
+```
+
+Each writes `eval_results/<tag>/<model>_mf32_eval.json`, containing `accuracy`
+and `category_wise_accuracy` — the Table 1 row and its per-category columns.
+GPU count and the thinking flag come from the registry, so the 32B models
+request two A40s and the `-thinking` variants get `--thinking_mode` without you
+having to remember either.
+
+### Table 1 and Table 2 — API models
+
+Three steps: inference, convert, score. See `api_evals/README.md`.
+
+```bash
+python api_evals/eval_gemini.py --config api_evals/configs/gemini.yaml
+python api_evals/convert_api_results.py \
+    --input_file eval_results/gemini-2.5-pro/raw.jsonl \
+    --output_file eval_results/gemini-2.5-pro/raw_full.json \
+    --model_name gemini-2.5-pro --modality video
+k9bench score --input_file eval_results/gemini-2.5-pro/raw_full.json \
+              --output_file eval_results/gemini-2.5-pro/eval.json
+```
+
+For Table 2, set `modality: audio_video` in the Gemini config, or use
+`api_evals/configs/qwen3_omni.yaml` for Qwen3-Omni. The Omni runner applies the
+150-second limit that produces the 2693-QA subset and reports how many questions
+it excluded.
+
+### Table 3 — LLM-as-judge
+
+```bash
+export OPENAI_API_KEY=sk-...
+python subjective_evals.py \
+    --evaluations eval_results/<tag>/<model>_mf32_eval.json \
+    --output      eval_results/<tag>/llm_judge.json \
+    --skipped     eval_results/<tag>/llm_judge_skipped.json
+```
+
+GPT-4o scores each answer 1–10 on logic, factuality, accuracy, conciseness and
+overall quality. Saves after every entry, so it is safe to interrupt and resume.
+
+---
+
+## 6. Repository layout
+
+```
+run_eval.sh              launcher: single job or sharded, both protocols
+install.sh               creates the conda env
+local_evals/             inference for locally-loaded models
+api_evals/               inference for API-served models, plus the converter
+k9bench/                 CLI and model registry
+docs/ADDING_A_MODEL.md   how to plug in a new model
+download_videos.py       yt-dlp fetch + ffmpeg remux
+evaluate_results.py      cosine-similarity scorer (open-ended)
+evaluate_results_mcq.py  exact-match scorer (MCQ, no GPU)
+subjective_evals.py      GPT-4o judge
+combine_shards.py        merge sharded runs, report missing shards
+```
+
+Inference lives in the two `*_evals/` folders because it is the part that varies
+per model family. Everything downstream — download, scoring, judging, merging —
+is shared and sits at the root.
+
+---
+
+## 7. Running at scale
+
+`run_eval.sh` is the SLURM backend behind `k9bench eval --shards N`, and the
+only shell script. `NUM_SHARDS=1` runs everything in one job; `NUM_SHARDS>1`
+submits a dependency chain of download → shards → merge and score.
+
+You normally do not call it directly — `--shards` sets these variables from the
+registry. Drive it yourself when you need a knob the registry does not carry,
+such as a custom time limit or an unregistered checkpoint:
+
+```bash
+NUM_SHARDS=24 MODEL_NAME=my-org/MyVLM-7B MODEL_FAMILY=qwen TIME_LIMIT=08:00:00 \
+    bash run_eval.sh
+```
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `MODEL_NAME` | `Qwen/Qwen3-VL-4B-Instruct` | HuggingFace model id |
+| `MODEL_FAMILY` | `qwen` | `qwen` or `internvl` |
+| `PROMPT_STYLE` | `openended` | `openended` or `mcq` |
+| `NUM_SHARDS` | `1` | >1 shards across that many SLURM jobs |
+| `MAX_FRAMES` | `32` | frames sampled per video |
+| `MAX_SAMPLES` | `10` | single-job mode only; `-1` for the full dataset |
+| `THINKING_MODE` | `0` | `1` for `-Thinking` model variants |
+| `GPUS` | `1` | A40s per shard; 32B models need 2 |
+| `VIDEO_DIR` / `OUT_DIR` | `k9bench_videos` / `eval_results` | paths |
+| `CONDA_ENV` | `k9bench` | environment to activate inside the job |
+
+If a shard fails, rerun the launcher: the MCQ runners resume from their
+checkpoint, and `combine_shards.py` reports which index ranges are missing.
+
+---
+
+## 8. Adding a model
+
+For a model that an existing runner already fits, this is a single registry
+entry in `k9bench/models/`:
+
+```python
+register(ModelSpec(name="my-vlm-7b", model_id="my-org/MyVLM-7B",
+                   family="qwen", gpus=1))
+```
+
+```bash
+k9bench eval --model my-vlm-7b --max_samples 5 --auto_download
+```
+
+See [docs/ADDING_A_MODEL.md](docs/ADDING_A_MODEL.md) for models needing their
+own loading or a different API.
+
+---
+
+## 9. Notes
+
+**Videos are not redistributed.** Only YouTube ids ship with the dataset;
+`download_videos.py` fetches each one and remuxes it with
+`ffmpeg -c copy -movflags +faststart`. That remux is not a re-encode — it makes
+the container seekable, which otherwise causes the video reader to hang.
+
+---
+
+## 10. Video Takedown and Opt-Out
+
+Content creators and rights holders may request the removal of their videos from K9-Bench at any time by submitting the [Takedown and Opt-Out Form](https://forms.gle/9YtQAwaoqnKhWriU6), or by emailing [khushattarde2003@gmail.com](mailto:khushattarde2003@gmail.com) or [yali30@gatech.edu.in](mailto:yali30@gatech.edu.in).
+
+Please include the YouTube video URL or ID and confirm that you are the creator or an authorized rights holder. Valid requests will be processed within 15 days. Upon approval, the corresponding video references, associated QA pairs, and metadata will be removed from the dataset and its splits.
+
+By accessing the dataset, users agree to honor such removal requests by discontinuing the use of removed items and using the latest available version of the dataset.
 
 ## Citation
 

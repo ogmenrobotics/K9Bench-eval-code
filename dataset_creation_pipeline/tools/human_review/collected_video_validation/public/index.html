@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Video Reviewer</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; }
+    iframe { width: 560px; height: 315px; margin: 20px auto; display: block; }
+    textarea { width: 300px; height: 60px; }
+  </style>
+</head>
+<body>
+  <h2>YouTube Video Review Tool</h2>
+  <div id="video-container"></div>
+  <div>
+    <button onclick="submitDecision('accepted')">Accept</button>
+    <button onclick="submitDecision('rejected')">Reject</button>
+  </div>
+  <div>
+    <label for="reason">Rejection Reason (if any):</label><br>
+    <textarea id="reason"></textarea>
+  </div>
+
+  <script>
+    let currentVideoId = null;
+
+    async function loadNextVideo() {
+      const res = await fetch('/next-video');
+      const data = await res.json();
+      currentVideoId = data.videoId;
+
+      const container = document.getElementById('video-container');
+      if (!currentVideoId) {
+        container.innerHTML = '<h3>No more videos to review.</h3>';
+        return;
+      }
+
+      container.innerHTML = `
+        <iframe src="https://www.youtube.com/embed/${currentVideoId}?autoplay=1" frameborder="0" allowfullscreen></iframe>
+        <p>Video ID: <strong>${currentVideoId}</strong></p>
+      `;
+    }
+
+    async function submitDecision(status) {
+      if (!currentVideoId) return;
+
+      const reason = document.getElementById('reason').value.trim();
+      await fetch('/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId: currentVideoId, status, reason })
+      });
+
+      document.getElementById('reason').value = '';
+      loadNextVideo();
+    }
+
+    loadNextVideo();
+  </script>
+</body>
+</html>

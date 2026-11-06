@@ -1,0 +1,29 @@
+You are an expert in paraphrasing. Given a question, a set of options (A, B, C, D, E), and the correct answer key (e.g., "B"), convert the options from subjective to objective language.
+
+- Focus only on directly observable cues such as posture, movement, vocalization, and interaction in the options.
+- If the question or options contains speaker or name-specific information (e.g., names of dogs), you may generalize or replace them with neutral terms (e.g., “the dog,” “the puppy”).
+- If the question or options contain any speaker-related information (e.g., “he said,” “she mentioned"), reframe in a neutral, third-person manner without changing the meaning.
+- Remove redundancy across options and make them concise while keeping each one distinct and semantically correct.
+- Each option must be a maximum of 20 words.
+- Do not change the correct answer key. Keep each option tied to its label.
+
+Provide the response strictly in JSON format:
+
+{
+  "question": "Question (Change only if it contained subject specific information or speaker-related information)",
+  "paraphrased_options": {
+    "A": "Paraphrased option A (≤20 words)",
+    "B": "Paraphrased option B (≤20 words)",
+    "C": "Paraphrased option C (≤20 words)",
+    "D": "Paraphrased option D (≤20 words)",
+    "E": "Paraphrased option E (≤20 words)"
+  },
+  "correct_answer_key": "{correct_answer_key}",
+  "validation": "Explain how the paraphrased correct option retains its meaning and remains distinct from the incorrect ones."
+}
+
+# High-Level Information:
+{high_level_json}
+
+# Question and Options with Correct Answer:
+{qa_json}

@@ -1,0 +1,43 @@
+# Configuration for YouTube Agent
+# Logging configuration
+logging:
+  level: DEBUG
+  format: "%(asctime)s - %(levelname)s - %(message)s"
+  googleapiclient:
+    level: WARNING
+    handlers: []
+# YouTube API settings
+youtube_api:
+  key_file: "../../data/meta_info/youtube_api_keys.txt"
+  retry_delay: 5 # Initial delay in seconds for API retries
+  max_delay: 60 # Maximum delay in seconds for API retries
+# Input source for video IDs
+input:
+  source: "../../data/meta_info/video_ids.txt" # Can be a file path (e.g., 'video_vlogs_ids.txt') or a search query (e.g., 'dog barking')
+  query_max_results: 10 # Maximum results when source is a search query
+# Output settings
+output:
+  directory: "../../data/meta_info/video_metadata"
+  video_details_file: "all_video_details.json"
+  video_ids_file: "video_ids.txt"
+  video_sources_file: "video_sources.json"
+# Processing parameters
+processing:
+  max_results_per_video: 5 # Maximum recommended videos per video title
+  max_videos_from_channel: 5 # Maximum videos to fetch from a channel (null for no limit)
+ 
+# Download settings
+download:
+  directory: "../../data/video_data/videos" # Directory to save downloaded videos
+ 
+# Filtering settings
+filtering:
+  subsampled_directory: "../../data/video_data/temp/frames" # Directory for temporary frame extractions
+  final_directory: "../../data/video_data/filtered_videos" # Directory for final filtered videos
+  reject_log_file: "../../data/meta_info/logs/video_collection_pipeline/rejected_videos.json" # Log file for rejected videos
+  filtered_ids_file: "filtered_video_ids.txt" # File for IDs of filtered videos
+  skipped_log_file: "../../data/meta_info/logs/video_collection_pipeline/skipped_videos.json" # Log file for skipped videos
+  gemini_api_key: "GEMINI_API_KEY" # Gemini API key
+  gemini_model: "gemini-2.0-flash" # Gemini model for video analysis
+  max_frames: 512 # Maximum frames to extract for analysis
+  keep_original: true # Whether to keep original video after filtering (true/false)

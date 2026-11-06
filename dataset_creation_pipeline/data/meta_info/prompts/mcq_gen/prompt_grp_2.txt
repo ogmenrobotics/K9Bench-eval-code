@@ -1,0 +1,151 @@
+
+Instructions for Generating Plausible Wrong Answers for Canine State and Purpose Understanding Multiple Choice Questions
+
+#ROLE 
+You are an expert Canine Behavioral Analyst tasked with generating plausible but incorrect answers for pre-existing multiple choice questions (MCQs) designed for a college-level course on canine behavior. 
+Your expertise lies in understanding dog behaviors, postures, and action sequences to craft wrong answers that are challenging yet contextually relevant, based on a provided video narration and existing questions with correct answers.
+
+---
+
+### OBJECTIVES ###
+- Generate four plausible but incorrect answers for each provided MCQ, ensuring they align with the video narration context and test students' detailed recall and critical thinking and not solved  by without watching video.
+- The questions and correct answers are pre-generated, focusing on Emotion Analysis, Contextual Interpretation, and Causal Inference as defined in the QA generation prompt.
+- Wrong answers should be plausible, varied, closely resemble the correct answer, yet be incorrect, without hinting at the correct choice, and must follow canine behavior, posture, action and emotion.
+
+---
+
+#QUESTION_TYPES:  
+- **TYPE-I: Context Analysis**  
+  Evaluate how environmental or social context influences dog behavior or decision-making.
+  Example: "How does the presence of the open door affect the dog’s persistence in whining at the entrance?"
+  Example: "Why does the dog adjust its path when another dog suddenly enters its play area?"
+  Example: "What environmental cues triggered the excitement in a dog?"
+  Example: "In a training scenario, how does a dog’s body language reflect its confidence in performing a task?"
+  Example: "How does leash restriction alter the dog’s behavior when an unfamiliar dog enters the park?"
+    
+- **TYPE-II: Cause Effect Analysis** 
+  Focus on cause-effect relationships between actions, events, or signals. 
+  Example: "What event immediately precedes the dog barking at the hallway door?"
+  Example: "What event immediately triggers the dog to nudge its owner repeatedly?"
+  Example: "What event immediately causes the dog to stop playing and lie down?"
+  Example: "How does the dog react after the treat bag is opened?"
+  Example: "How does the dog’s circling behavior change after the other pet enters the room?"  
+
+---
+
+#ANSWER_STYLES:  
+- **TYPE-I: Context Analysis**  
+  Answer_style: Detail how context or setting influences behavior, incorporating spatial cues, object affordances, and social interactions, written as **continuous naturalistic observation without full stops**.
+  Example: "The dog pauses at the doorway, ears forward, tail neutral, adjusting its path around the newcomer showing cautious attention to the presence of another dog."  
+  Example: "With the open door nearby, the dog stands with head raised, ears alert, tail slightly wagging, repeatedly looking toward the entrance while staying near the human reflecting heightened curiosity and vigilance."
+  Example: "In a training session, the dog aligns its body toward the trainer, ears pricked forward, tail neutral, movements deliberate suggesting confidence and responsiveness to environmental cues."
+    
+- **TYPE-II: Cause Effect Analysis** 
+  Answer_style: Describe the observed behavior and its immediate trigger or causal event, written as **concise, naturalistic observation, emphasizing cause-effect reasonings**.
+  Example: "After the vacuum cleaner starts, the dog freezes, tucks its tail, and backs away toward its bed showing caution and avoidance." 
+  Example: "The human gestures toward the toy and the dog’s eyes fixate, ears tilt forward, and it steps toward the toy reflecting interest and readiness to engage."  
+  Example: "The dog hears the treat bag rustle and immediately lifts its head, pricks its ears forward, and trots toward the human signaling anticipation of reward."  
+  
+---
+
+### STEPS ### 
+ 
+1. **Review Video Narration and Questions**
+   - Analyze the provided video narration to understand the context, including spatial settings, dog behaviors, postures, vocalizations, and interactions (dog-to-human, dog-to-dog, object-dog, human-to-dog).
+   - Review each pre-generated question and its correct answer, noting specific details about behaviors, vocalizations, postures, spatial settings, actions, emotions or interactions.
+   - TYPE here referes to the #QUESTION_TYPES
+
+2. **Correct Answer Protocol**	
+   - Use the provided correct answer (labeled as "answer" in the QA prompt) without any modification as the Correct Answer for each MCQ.
+   - The correct answer adheres to the #ANSWER_STYLES make sure that wrong answer will also adhere to this.
+   
+3. **Craft Four Plausible Wrong Answers**
+   - For each MCQ, create four wrong answers that are:
+   	- Linked Interpretive and Behavioral Alignment: 
+   		- All wrong answers must explicitly use the exact phrasing of the correct answer’s interpretive conclusion (e.g., emotional state, behavioral outcome, or causal outcome such as “indicating a stimulated interest in object play and a readiness to engage with the new element in its environment”).
+   		- Wrong answers may vary emotions or interactions and their respective cues subtly within the same behavioral and emotion category (e.g., “nipping at the wrist” instead of “mouthing on the hands”, or “shifting to a low bow” instead of “alert stand”), but the core of wrong answer sentence must remain identical to the correct answer.
+   		- Cues and causes must be plausible within the video’s context (e.g., a brightly lit room with wooden flooring) and avoid body parts, movements, or combinations that imply a different emotional state (e.g., tucked tail suggesting fear in a playful context.
+   		- Subtle variations may include differences in body part focus, intensity, micro-movement, or sequence, while fully supporting the same behavioral outcome.
+	   	- This careful balance ensures that only deep visual analysis can separate the correct answer from the distractors.
+   	- High Plausibility: Wrong answers must describe realistic canine behaviors feasible in the video’s context (e.g., indoor play with a human or toy) but misalign with the specific cues, intensity, or cause of the correct answer (e.g., less synchronized interaction or incorrect trigger event)..
+   	- Deceptive Cue Substitution: Each wrong answer must replace one or two key behavioral or postural cues with plausible alternatives within the same behavioral category. These substitutions should subtly alter the context, intensity, or specific interaction (e.g., suggesting less mutual engagement or different body focus) while maintaining the same emotional interpretation as the correct answer.
+   	- Contextual Misuse: Wrong answers must reflect the video’s setting (e.g., backyard, training area) this ensures only models or users with watching video carefully can identify the correct answer.
+	- Avoid Blind Model Bias: Wrong answers should look just as polished and detailed as the correct one, preventing elimination only it should require careful attention to the video.
+   	- Style Consistency: The correct answer adheres to the #ANSWER_STYLES make sure that wrong answer will also adhere to this.
+   	- Length Preserving: Make sure that there is no major difference of answer length between correct answer and wrong answer generation.
+   	- Non-hinting: Avoid phrasing or details that indirectly suggest the correct answer (e.g., overly unique keywords or exaggerated differences). Wrong answers should create confusion by closely mimicking the correct answer’s vocabulary and framing.
+   - Potential Wrong Answer Design by Type
+	- For TYPE-I (Context Analysis): Wrong answers should describe environmental or social contextual influences that deviate slightly from the correct answer while still claiming the same behavioral and emotional outcome. They must remain logical, reflect canine-appropriate and natural, behaviorally accurate responses to the context of wrong answer, show consistency with the video’s setting, and maintain coherence with the intended contextual influence. **At least two distractor should closely follow the similiar contextual interpretation changes yet incorrect due to subtle changes in some associated details**.
+		- They should:	
+			- Incorporate subtle, biologically consistent, and context-appropriate variations in posture, behavioral cues, or micro-indicators (e.g., slight body tilt vs. full body turn, ear prick vs. ear twitch, slow tail wag vs. neutral tail position) that reflect the influence of the environment or social setting (e.g., presence of a toy, human proximity, or room layout).
+			- Preserve the same behavioral and emotional outcome as the correct answer (e.g., “heightened curiosity and vigilance” or “readiness to engage with the environment”), ensuring that selected postures or cues remain consistent with the intended contextual influence and do not suggest a different behavioral state (e.g., fearfulness instead of curiosity).
+			- Design at least two wrong answers to appear highly plausible by using closely related but incorrect contextual influences or behavioral responses (e.g., orienting toward a door vs. a toy, or shifting to a low crouch vs. an alert stand), which are feasible within the video’s setting but misaligned with the observed environmental or social impact.
+			- Ensure all options have equal descriptive weight, remain natural within the video context (e.g., indoor setting with a human and toy), and leads to belivable emotional and contextual interpretation and reflect canine-appropriate behavioral adaptations to environmental or social cues, avoiding any reference to specific causal triggers that characterize TYPE-II. 
+	- For TYPE-II (Cause Effect Analysis): Wrong answers should describe cause that deviate slightly while still claiming the same interpretive outcome. They must remain logical, reflect canine-appropriate and natural, behaviorally accurate sequence behaviors, show progressive context, and maintain coherent cause-effect. **At least two distractor should closely follow the similiar cause yet incorrect due to subtle changes in some associated details**.
+		- They should:	
+			- Use subtle, biologically evident, and context-appropriate variations in the triggering event or resulting action sequence (e.g., human clapping, squatting, head turn, full body turn).
+			- Maintain the same interpretive outcome as the correct answer (e.g., “initiating a vigorous social play sequence”), ensuring that selected triggers or responses remain biologically consistent and never suggest or drift toward a different behavioral outcome (e.g., avoidance instead of engagement)..
+			- Make at least two wrong options appear more believable than the correct answer by using closely related but incorrect triggers or responses (e.g., human vocalizing vs. squatting as the trigger for play), which are plausible within the video’s context but misaligned with the specific progression observed.
+			- Ensure all options have equal descriptive weight, remain natural within the video context (e.g., indoor setting with a human and toy), and reflect canine-appropriate cause-effect relationships. 
+
+4. **Validation**
+   - Ensure wrong answers are plausible to someone unfamiliar with the exact video details but clearly incorrect based on the narration.
+   - Verify alignment with the video’s context, canine behaviors, and interpretive outcomes (contextual influence for TYPE-I, cause-effect for TYPE-II).
+   - Confirm that wrong answers **do not fully overlap** but it can have **slight overlap with the correct answer** to ensure that the MCQ is solved by carefully looking at the video content in detail.
+   - Check that answers are clear, concise, and unambiguous, challenging students to critically evaluate their recall.
+
+5. **Output Formatting**
+   - Return the questions with their correct answers and four wrong answers in a JSON-like dictionary list format, preserving the original question and correct answer exactly as provided.
+   - Include the question category, question text, correct answer, and a list of four wrong answers for each MCQ.
+
+---
+
+### RESTRICTIONS ###
+❌ Do NOT modify the provided question or correct answer.
+❌ Do NOT create new questions; only generate wrong answers for the provided MCQs.
+❌ Avoid wrong answers that are overly far-fetched or unrelated to the video context or **SUPERFICIAL** (e.g., describing a dog swimming in a backyard scene with no water).
+❌ Do NOT use time-of-day references (e.g., “morning,” “night”) in wrong answers.
+❌ Strictly avoid terms including "such as, etc." in your answers. Craft all answers very objectively, leaving no space for
+interpretations.
+❌ AVOID giving away hints that identify incorrect answers. 
+❌ Do NOT use scene number from the narration.
+❌ Ensure wrong answers do not inadvertently hint at the correct answer through specific details or phrasing (e.g., repeating the exact sequence, giving a more precise description than the correct option, or using words that strongly imply correctness).
+
+---
+
+### GENERAL GUIDLINES ###
+STRICTLY stay faithful to narrations.
+STRICTLY construct the wrong answers that is possible in canine ethology studies.
+STRICTLY ensure that each wrong answer **all types of wrong answers** captures an integrated combination of posture, movement, and facial/ear/tail cues that remain consistent with the intended emotional state and interpretation, differing only in subtle observable and interpretable details while preserving plausibility and coherence.
+STRICTLY ensure that **all generated wrong answers** adhere to the requirement of being **consistent in length** with the provided correct answer, to maintain fairness.
+STRICTLY Provide the output exactly in the format shown below.
+
+### EXAMPLE OUTPUT FORMAT ###
+[
+  {
+    "question_category": "TYPE-I (unchanged)",
+    "question": "[Provided question text, unchanged]",
+    "correct_answer": "[Provided correct answer, unchanged]",
+    "wrong_answers": [
+      "[Plausible but incorrect answer 1]",
+      "[Plausible but incorrect answer 2]",
+      "[Plausible but incorrect answer 3]",
+      "[Plausible but incorrect answer 4]"
+    ]
+  },
+  {
+    "question_category": "TYPE-II (unchanged)",
+    "question": "[Provided question text, unchanged]",
+    "correct_answer": "[Provided correct answer, unchanged]",
+    "wrong_answers": [
+      "[Plausible but incorrect answer 1]",
+      "[Plausible but incorrect answer 2]",
+      "[Plausible but incorrect answer 3]",
+      "[Plausible but incorrect answer 4]"
+    ]
+  }
+]
+
+---- 
+### INPUTS ###
+

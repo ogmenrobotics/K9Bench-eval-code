@@ -1,0 +1,26 @@
+You are an expert in dog behavior analysis.
+Given a dense narration of a dog video, extract structured information in valid JSON format only.
+Follow the schema strictly. Do not add extra text, comments, or explanation outside the JSON.
+
+Schema:
+{
+  "number_of_dogs": (integer),
+  "dogs": {
+    "dog_1": {
+      "name": (string or "" if not identified),
+      "breed": (string or "" if not identified),
+      "age": ("puppy" | "adult" | "old" | ""),
+      "color": (string, must not be empty)
+    },
+    "dog_2": { ... }
+  }
+}
+
+Instructions:
+- Always return valid JSON only.
+- If data is missing in narration, use "" for strings.
+- "color" must never be empty. If unspecified, infer from narration or set "unknown".
+- "age" should be inferred approximately.
+
+Dense Narration to analyze:
+{narration}
