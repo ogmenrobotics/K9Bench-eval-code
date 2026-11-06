@@ -1,13 +1,36 @@
-![arXiv](https://img.shields.io/badge/arXiv-2607.02680-B31B1B?style=flat-square&logo=arxiv&logoColor=white) [](https://ogmenrobotics.github.io/K9Bench/)![Website](https://img.shields.io/badge/Website-K9--Bench-blue?style=flat-square)[](https://ogmenrobotics.github.io/K9Bench/)![Accepted at NeurIPS E&D 2026](https://img.shields.io/badge/NeurIPS_E%26D-2026-2E8B57?style=flat-square)[ ](https://ogmenrobotics.github.io/K9Bench/)![Dataset](https://img.shields.io/badge/Dataset-Hugging_Face-yellow?style=flat-square&logo=huggingface&logoColor=white)[
+<p align="center">
+  <a href="https://arxiv.org/abs/2607.02680">
+    <img src="https://img.shields.io/badge/arXiv-2607.02680-B31B1B?style=flat-square&logo=arxiv&logoColor=white" alt="arXiv">
+  </a>
+  <a href="https://ogmenrobotics.github.io/K9Bench/">
+    <img src="https://img.shields.io/badge/Website-K9--Bench-blue?style=flat-square" alt="Website">
+  </a>
+  <img src="https://img.shields.io/badge/NeurIPS_E%26D-2026-2E8B57?style=flat-square" alt="Accepted at NeurIPS E&D 2026">
+  <a href="https://huggingface.co/datasets/ogmen/K9Bench">
+    <img src="https://img.shields.io/badge/Dataset-Hugging_Face-yellow?style=flat-square&logo=huggingface&logoColor=white" alt="Dataset">
+  </a>
+</p>
 
-# K9-Bench: Evaluating Multimodal LLMs on Canine-Centric Videos
+<h1 align="center">
+  K9-Bench: Evaluating Multimodal LLMs on Canine-Centric Videos
+</h1>
 
-[Khush Attarde*](#), [Yusuf Ali](#)*, [Megha Thukral†](#), [Divye Bhutani](#), [Thomas Ploetz](#), [Zsolt Kira](#)
+<p align="center">
+  <a href="#">Khush Attarde*</a>,
+  <a href="#">Yusuf Ali*</a>,
+  <a href="#">Megha Thukral<sup>†</sup></a>,
+  <a href="#">Divye Bhutani</a>,
+  <a href="#">Thomas Ploetz</a>,
+  <a href="#">Zsolt Kira</a>
+</p>
 
-** Equal contribution   ·   † Core contributor*
+<p align="center">
+  <em>
+    * Equal contribution &nbsp; · &nbsp; † Core contributor
+  </em>
+</p>
 
 ---
-
 
 
 ## ⚠️ License & Opt-Out
